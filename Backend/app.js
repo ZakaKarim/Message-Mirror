@@ -3,6 +3,7 @@ const express = require("express")
 const connectDB = require('./config/db')
 const colors = require('colors')
 const userRoutes = require('./routes/userRoutes')
+const chatRoutes = require('./routes/chatRoutes')
 
 dotenv.config();
 // console.log('DB_URL: in app.js', process.env.DB_URL)
@@ -18,6 +19,7 @@ app.get('/',(req,res)=>{
 })
 
 app.use('/api/user',userRoutes)
+app.use('/api/chat',chatRoutes)
 
 const PORT = process.env.PORT || 5000
 
