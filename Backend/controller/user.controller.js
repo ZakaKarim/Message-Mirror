@@ -59,7 +59,8 @@ const allUsers = asyncHandler(async(req,res)=>{
     // console.log(keyword)
 
     const users = await User.find(keyword).find({_id: {$ne: req.user._id}}) 
-    res.send(users)
+     res.send(users)
+    //return res.status(200).json({Message:"User get Successfuly",users})
 
 });
 
