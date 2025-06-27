@@ -13,6 +13,7 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  Spinner,
   Text,
   Tooltip,
   useDisclosure,
@@ -97,6 +98,7 @@ const SideDrawer = () => {
           };
           const { data } = await axios.post(`/api/chat`,{userId},config);
           console.log("Data:",data)
+          if(!chats.find((c)=> c._id === data._id)) setChats([data, ...chats]);
 
           setSelectedChat(data);
           setLoadingChat(false);
@@ -203,6 +205,7 @@ const SideDrawer = () => {
                 );
               })
             )}
+             {loadingChat && <Spinner ml="auto" d="flex" />}
           </DrawerBody>
         </DrawerContent>
       </Drawer>

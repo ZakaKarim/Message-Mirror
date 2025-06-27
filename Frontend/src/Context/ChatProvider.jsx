@@ -6,7 +6,8 @@ const ChatContext = createContext()
 const ChatProvider = ({children})=>{
     const [user, setUser] = useState();
     const [selectedChat, setSelectedChat] = useState();
-    const [chats, setChats] = useState();
+    const [chats, setChats] = useState([]);//if seeing error in  fetching the chat remove the array from here
+    //console.log("Context state:", { user, chats });
     // console.log("user", user)
     // console.log("setUser",setUser)
 
