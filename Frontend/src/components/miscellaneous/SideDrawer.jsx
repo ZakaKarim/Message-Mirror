@@ -35,13 +35,14 @@ const SideDrawer = () => {
   const [loadingChat, setLoadingChat] = useState();
 
   const history = useHistory();
-  const { user,setSelectedChat, chats, setChats } = ChatState();
+  const { user, setSelectedChat, chats, setChats } = ChatState();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   // Debugging: Log user data
-  useEffect(() => {
-    console.log("Current user:", user);
-  }, [user]);
+  // useEffect(() => {
+  //   console.log("Current user:", user);
+  // }, []);
+  console.log("Current user:", user);
 
   // Function to logout the user
   const logoutHandler = () => {
@@ -62,10 +63,19 @@ const SideDrawer = () => {
     }
     try {
       setLoading(true);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const token = userInfo?.token;
+      //console.log("userInfo",userInfo)
+      //console.log("token", token);
+
+      if (!token) {
+        console.log("No token found in localStorage");
+        return;
+      }
 
       const config = {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
           // "Content-Type":"application/json",
         },
       };
@@ -77,7 +87,7 @@ const SideDrawer = () => {
     } catch (error) {
       toast({
         title: "Error Occured",
-        description: "Failed to Load the Search Results",
+        description: error.message,
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -87,31 +97,38 @@ const SideDrawer = () => {
   };
 
   //function to access or create the chat
-  const accessChat = async(userId) => {
+  const accessChat = async (userId) => {
+    console.log(userId);
     try {
-        setLoadingChat(true);
-        const config = {
-            headers: {
-            "Content-Type":"application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          };
-          const { data } = await axios.post(`/api/chat`,{userId},config);
-          console.log("Data:",data)
-          if(!chats.find((c)=> c._id === data._id)) setChats([data, ...chats]);
+      setLoadingChat(true);
+      // const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      // const token = userInfo?.token;
+     // console.log("userInfo",userInfo)
+     // console.log("token", token);
+      const config = {
 
-          setSelectedChat(data);
-          setLoadingChat(false);
-          onClose();
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      console.log("After Config")
+      const { data } = await axios.post(`/api/chat`, { userId }, config);
+      console.log("Data:", data)
+      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+
+      setSelectedChat(data);
+      setLoadingChat(false);
+      onClose();
     } catch (error) {
-        toast({
-            title: "Error while Fetching the chats",
-            description: error.message,
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-            position: "bottom-left",
-          });
+      toast({
+        title: "Error while Fetching the chats",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
     }
   };
 
@@ -205,7 +222,7 @@ const SideDrawer = () => {
                 );
               })
             )}
-             {loadingChat && <Spinner ml="auto" d="flex" />}
+            {loadingChat && <Spinner ml="auto" d="flex" />}
           </DrawerBody>
         </DrawerContent>
       </Drawer>

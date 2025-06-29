@@ -28,10 +28,12 @@ const GroupChatModal = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
 
+  // Chat Context
   const { user, chats, setChats } = ChatState();
-  console.log("user", user);
+  //console.log("user", user);
   // console.log("user.Token", user.token)
 
+  //Method use to search the user and add it into the Chat
   const handleSearch = async (query) => {
     setSearch(query);
     if (!query) {
@@ -69,6 +71,7 @@ const GroupChatModal = ({ children }) => {
     }
   };
 
+  //Method to  create a group
   const handleSubmit = async () => {
     if (!groupChatName || !selectedUsers) {
       toast({
@@ -102,7 +105,6 @@ const GroupChatModal = ({ children }) => {
       },config
      );
      setChats([data, ...chats]);
-     onClose()
      onClose();
      toast({
         title: "New Group Chat is Created",
@@ -122,6 +124,7 @@ const GroupChatModal = ({ children }) => {
     }
   };
 
+//Method to add memeber in a groupChat
   const handleGroup = (userToAdd) => {
     if (selectedUsers.includes(userToAdd)) {
       toast({
@@ -136,6 +139,7 @@ const GroupChatModal = ({ children }) => {
     setSelectedUsers([...selectedUsers, userToAdd]);
   };
 
+  //Method to remove the user from the group before creating it 
   const handleDelete = (delUser) => {
     setSelectedUsers(selectedUsers.filter((user) => user._id !== delUser._id));
   };
@@ -166,7 +170,7 @@ const GroupChatModal = ({ children }) => {
             </FormControl>
             <FormControl>
               <Input
-                placeholder="Add Users by their email"
+                placeholder="Add Users by their email or name"
                 mb={1}
                 onChange={(e) => handleSearch(e.target.value)}
               />

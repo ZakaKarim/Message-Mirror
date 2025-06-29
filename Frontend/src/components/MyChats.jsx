@@ -7,12 +7,12 @@ import ChatLoading from "./ChatLoading";
 import { getSender } from "../config/ChatLogics";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 
-const MyChats = () => {
+const MyChats = ({fetchAgain}) => {
   const [loggedUser, setLoggedUser] = useState();
   const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
   // console.log("Logged User:", loggedUser);
   // console.log("Chats:", chats);
-  // console.log("user",user)
+  //console.log("user",user)
   const toast = useToast();
 
   // const fetchChats = async () => {
@@ -101,7 +101,7 @@ const MyChats = () => {
     } else {
       console.log("No token available");
     }
-  }, []); // Remove user?.token dependency
+  }, [fetchAgain]); // Remove user?.token dependency
 
   return (
     <Box
