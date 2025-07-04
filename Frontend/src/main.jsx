@@ -8,13 +8,13 @@ import App from './App.jsx'
 import ChatProvider from './Context/ChatProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <ChatProvider>
   <BrowserRouter>
+  <ChatProvider>
   <ChakraProvider>
     <App />
   </ChakraProvider>
-  </BrowserRouter>
   </ChatProvider>
+  </BrowserRouter>,
   // <App />
   
 )

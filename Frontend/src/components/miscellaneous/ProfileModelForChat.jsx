@@ -4,7 +4,7 @@ import React from 'react'
 
 const ProfileModelForChat = ({user,children}) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    console.log("inside Profile Model For Chat")
+    //console.log("inside Profile Model For Chat")
     //console.log("user",user)
 
   return (

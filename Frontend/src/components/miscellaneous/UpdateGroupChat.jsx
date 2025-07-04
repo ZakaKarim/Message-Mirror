@@ -22,7 +22,7 @@ import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import axios from "axios";
 import UserListItem from "../userAvatar/UserListItem";
 
-const UpdateGroupChat = ({ fetchAgain, setFetchAgain }) => {
+const UpdateGroupChat = ({ fetchAgain, setFetchAgain, fetchMessage }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [groupChatName, setGroupChatName] = useState();
@@ -80,7 +80,7 @@ const UpdateGroupChat = ({ fetchAgain, setFetchAgain }) => {
 
       user1._id === user.user._id ? setSelectedChat() : setSelectedChat(data);
       setFetchAgain(!fetchAgain);
-      //fetchMessages();
+      fetchMessages();
       setLoading(false);
     } catch (error) {
       toast({
