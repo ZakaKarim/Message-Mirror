@@ -18,44 +18,58 @@ import axios from "axios";
 import "./style.css"
 import ScrollAbleChat from "./ScrollAbleChat";
 
+import io from "socket.io-client";
+const EndPoint = "http://localhost:7000"
+var socket, selectChatCompare;
+
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState();
   const toast = useToast();
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [isTyping, setisTyping] = useState(false)
   //console.log("selectedChat", selectedChat, selectedChat._id);
   //console.log("selectedChat.users",selectedChat?.users)
   //console.log("user in single chat ", user);
 
 
+    useEffect(() => {
+    socket = io(EndPoint);
+    socket.emit("setup", user.user);
+    socket.on("connection", ()=> setSocketConnected(true))
+
+  }, [])
+
   //function fetchMessage  to fetch all the message 
-  const fetchMessage =async ()=>{
-    if(!selectedChat) return;
+  const fetchMessage = async () => {
+    if (!selectedChat) return;
     try {
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-        const token = userInfo?.token;
-        //   console.log("userInfo", userInfo);
-        //   console.log("token", token);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const token = userInfo?.token;
+      //   console.log("userInfo", userInfo);
+      //   console.log("token", token);
 
-        if (!token) {
-          console.log("No token found in localStorage");
-          return;
-        }
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-        setLoading(true);
+      if (!token) {
+        console.log("No token found in localStorage");
+        return;
+      }
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      setLoading(true);
 
-        const { data } = await axios.get(`/api/message/${selectedChat._id}`, config);
-        console.log("messages",messages);
-        
-        setMessages(data)
-        setLoading(false)
+      const { data } = await axios.get(`/api/message/${selectedChat._id}`, config);
+      console.log("messages", messages);
+
+      setMessages(data)
+      setLoading(false)
+      socket.emit("join chat",selectedChat._id)
     } catch (error) {
-        toast({
+      toast({
         title: "Error Occured!",
         description: "Failed to Load the Messages",
         status: "error",
@@ -65,12 +79,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       });
     }
   }
-  
+
   //UseEffect to call this function inside it 
   useEffect(() => {
     fetchMessage();
+    selectChatCompare = selectedChat;
   }, [selectedChat]);
-  
+
+ useEffect(() => {
+  socket.on("message recieved", (newMessageRecieved)=>{
+    if(!selectChatCompare || selectChatCompare._id !== newMessageRecieved.chat._id){
+      // give notification
+    }else{
+      setMessages([...messages, newMessageRecieved]);
+    }
+  });
+ })
+ 
+
 
   // sendMessage function
   const sendMessage = async (event) => {
@@ -101,7 +127,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           config
         );
         console.log("data is ", data);
-        setMessages([...messages,data])
+
+        socket.emit("new message", data)
+        setMessages([...messages, data])
       } catch (error) {
         toast({
           title: "Error Occured!",
@@ -114,6 +142,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     }
   };
+
+
+
 
   //typingHandler function
   const typingHandler = (e) => {
