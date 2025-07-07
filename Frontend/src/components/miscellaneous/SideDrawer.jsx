@@ -27,6 +27,9 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 import ChatLoading from "../ChatLoading";
 import UserListItem from "../userAvatar/UserListItem";
+import { getSender } from "../../config/ChatLogics";
+import NotificationBadge from "react-notification-badge";
+import { Effect } from "react-notification-badge";
 
 const SideDrawer = () => {
   const [search, setSearch] = useState("");
@@ -35,14 +38,21 @@ const SideDrawer = () => {
   const [loadingChat, setLoadingChat] = useState();
 
   const history = useHistory();
-  const { user, setSelectedChat, chats, setChats } = ChatState();
+  const {
+    user,
+    setSelectedChat,
+    chats,
+    setChats,
+    notification,
+    setNotification,
+  } = ChatState();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   // Debugging: Log user data
   // useEffect(() => {
   //   console.log("Current user:", user);
   // }, []);
-  console.log("Current user:", user);
+  // console.log("Current user:", user);
 
   // Function to logout the user
   const logoutHandler = () => {
@@ -83,7 +93,7 @@ const SideDrawer = () => {
       setLoading(false);
       setSearchResult(data);
       //console.log("setSearchResult",setSearchResult)
-      console.log("data", data);
+      //console.log("data", data);
     } catch (error) {
       toast({
         title: "Error Occured",
@@ -98,23 +108,22 @@ const SideDrawer = () => {
 
   //function to access or create the chat
   const accessChat = async (userId) => {
-    console.log(userId);
+    //console.log(userId);
     try {
       setLoadingChat(true);
       // const userInfo = JSON.parse(localStorage.getItem("userInfo"));
       // const token = userInfo?.token;
-     // console.log("userInfo",userInfo)
-     // console.log("token", token);
+      // console.log("userInfo",userInfo)
+      // console.log("token", token);
       const config = {
-
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user.token}`,
         },
       };
-      console.log("After Config")
+      // console.log("After Config")
       const { data } = await axios.post(`/api/chat`, { userId }, config);
-      console.log("Data:", data)
+      // console.log("Data:", data)
       if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
 
       setSelectedChat(data);
@@ -157,9 +166,26 @@ const SideDrawer = () => {
         <div>
           <Menu>
             <MenuButton p={"2px"}>
+              <NotificationBadge
+                count={notification.length}
+                effect={Effect.SCALE}
+              />
               <BellIcon fontSize={"2xl"} m={2}></BellIcon>
             </MenuButton>
-            {/* <MenuList></MenuList> */}
+            <MenuList pl={5}>
+              {!notification.length && "No New Message"}
+              {notification.map((notify )=> (
+                <MenuItem key={notify._id} onClick={()=>{
+                  setSelectedChat(notify.chat)
+                  setNotification(notification.filter((n)=> n !== notify ));
+                }}>
+                  {notify.chat.isGroupChat
+                    ?`New Message in ${notify.chat.chatName}`
+                    : `New Message from ${getSender(user.user,notify.chat.users)}`
+                  }
+                </MenuItem>
+              ))}
+            </MenuList>
           </Menu>
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>

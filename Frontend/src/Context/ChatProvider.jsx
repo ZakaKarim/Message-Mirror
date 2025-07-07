@@ -7,6 +7,7 @@ const ChatProvider = ({ children }) => {
   const [user, setUser] = useState();
   const [selectedChat, setSelectedChat] = useState();
   const [chats, setChats] = useState([]); //if seeing error in  fetching the chat remove the array from here
+  const [notification, setNotification] = useState([]);
   //console.log("Context state:", { user, chats });
   // console.log("user", user)
   // console.log("setUser",setUser)
@@ -28,7 +29,7 @@ const ChatProvider = ({ children }) => {
 
   return (
     <ChatContext.Provider
-      value={{ user, setUser, selectedChat, setSelectedChat, chats, setChats }}
+      value={{ user, setUser, selectedChat, setSelectedChat, chats, setChats,notification, setNotification }}
     >
       {children}
     </ChatContext.Provider>
